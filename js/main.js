@@ -1,14 +1,21 @@
-if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
-
 var container, stats;
 
-var camera, scene, renderer, objects;
+var camera, scene, renderer, loader;
 var keyLight, fillLight, backLight;
 var dae;
+var model = 'models/greenhouse.dae';
+// var model = 'models/dragon.dae';
+// var model = 'models/microscope.dae';
 
-var loader = new THREE.ColladaLoader();
+
+// Check for webGL
+if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
+
+
+// Collada Loader
+loader = new THREE.ColladaLoader();
 loader.options.convertUpAxis = true;
-loader.load( 'models/greenhouse.dae', function ( collada ) {
+loader.load( model, function ( collada ) {
 
 	dae = collada.scene;
 	skin = collada.skins[ 0 ];
@@ -21,13 +28,46 @@ loader.load( 'models/greenhouse.dae', function ( collada ) {
 
 } );
 
+// Camera Tweener
+var camPosition = function( position, time ){
+	this.tween = function(){
+		TWEEN.removeAll();
+		camTweener( position, time );
+	};
+	return this;
+}
+
+function camTweener( newCamPosition, time ) {
+
+	var camCurrentPosition	= camera.position;
+	var camCurrentRotation	= camera.rotation;
+
+	tweenPosition = new TWEEN.Tween( camCurrentPosition )
+		.to( newCamPosition , time )
+		.delay(0)
+		.easing(TWEEN.Easing.Sinusoidal.InOut)
+		.onUpdate( function() {
+			camera.position = camCurrentPosition;
+			camera.rotation = camCurrentRotation;
+		});
+
+	tweenPosition.start();
+}
+
+// Create the scene
 function init() {
 
 	container = document.createElement( 'div' );
 	document.body.appendChild( container );
 
 	camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
-	camera.position.set( 3, 3, 6 );
+	camera.position.set( 4, 4, 8 );
+
+	// Camera Positions for GUI
+
+	camOne = new camPosition( { x: 4, y: 4, z: 8 }, 1000 );
+	camTwo = new camPosition( { x: -5, y: 2, z: 10 }, 1000 );
+	camThree = new camPosition( { x: 0, y: 3, z: -6}, 1000 );
 
 	scene = new THREE.Scene();
 
@@ -58,9 +98,7 @@ function init() {
 
 	// Lights
 
-	// scene.add( new THREE.AmbientLight( 0x808080 ) );
-
-	keyLight = new THREE.PointLight( 0xffffff, 1 );
+	keyLight = new THREE.PointLight( 0xffffff, 1.15 );
 	keyLight.position.x = 4;
 	keyLight.position.y = 4;
 	keyLight.position.z = 4;
@@ -72,11 +110,11 @@ function init() {
 	fillLight.position.z = 7;
 	scene.add( fillLight );
 
-	fillLight = new THREE.PointLight( 0xffffff, .35 );
-	fillLight.position.x = 0;
-	fillLight.position.y = 5;
-	fillLight.position.z = -10;
-	scene.add( fillLight );
+	backLight = new THREE.PointLight( 0xffffff, .35 );
+	backLight.position.x = 0;
+	backLight.position.y = 5;
+	backLight.position.z = -10;
+	scene.add( backLight );
 
 	// Camera Controls
 
@@ -108,6 +146,12 @@ function init() {
 	gui.add(dae.scale, 'z', .002, .01)
 		.name('Scale Z');
 
+	var camFolder = gui.addFolder( 'Camera Positions' );
+	camFolder.open();
+	camFolder.add( camOne, 'tween' ).name( 'Camera Right' );
+	camFolder.add( camTwo, 'tween' ).name( 'Camera Left' );
+	camFolder.add( camThree, 'tween' ).name( 'Camera Rear' );
+
 
 	// Events
 
@@ -124,13 +168,13 @@ function onWindowResize() {
 
 }
 
-
 function animate() {
 
 	requestAnimationFrame( animate );
 
 	render();
 	stats.update();
+	TWEEN.update();
 	controls.update();
 
 }
