@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - collada loader</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				font-family: Monospace;
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+			}
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 10px;
+				width: 100%;
+				text-align: center;
+				z-index: 100;
+				display:block;
+
+			}
+
+			a { color: skyblue }
+		</style>
+	</head>
+	<body>
+		<div id="info">
+			<a href="http://threejs.org" target="_blank">three.js</a> - Collada Loader 
+		</div>
+
+		<script src="js/three/three.min.js"></script>
+		<script src="js/three/controls/OrbitControls.js"></script>
+
+		<script src="js/three/loaders/ColladaLoader.js"></script>
+		<script src="js/three/Detector.js"></script>
+		<script src="js/three/libs/stats.min.js"></script>
+		<script src="js/three/libs/dat.gui.min.js"></script>
+
+		<script src="js/main.js"></script>
+
+	</body>
+</html>
